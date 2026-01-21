@@ -15,6 +15,8 @@ function initializeApp() {
     setupFileUpload();
     setupMarketplaceFilters();
     setupProductButtons();
+    setupRoleToggle();
+    setupFarmerForm();
     setupLogout();
 }
 
@@ -255,16 +257,236 @@ function setupMarketplaceFilters() {
             this.classList.add('active');
             
             // Filter products based on category
-            const category = this.getAttribute('data-en');
+            const category = this.getAttribute('data-category');
             filterProducts(category);
         });
     });
 }
 
 function filterProducts(category) {
-    console.log('Filtering products by:', category);
-    // This would typically filter the displayed products
-    // For now, it's a placeholder for backend integration
+    const productCards = document.querySelectorAll('.product-card');
+    
+    productCards.forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// =====================
+// Role Toggle (Farmer/Consumer)
+// =====================
+function setupRoleToggle() {
+    const consumerViewBtn = document.getElementById('consumerViewBtn');
+    const farmerViewBtn = document.getElementById('farmerViewBtn');
+    const consumerView = document.getElementById('consumerView');
+    const farmerView = document.getElementById('farmerView');
+
+    if (consumerViewBtn && farmerViewBtn) {
+        consumerViewBtn.addEventListener('click', function() {
+            consumerViewBtn.classList.add('active');
+            farmerViewBtn.classList.remove('active');
+            consumerView.classList.add('active');
+            farmerView.classList.remove('active');
+        });
+
+        farmerViewBtn.addEventListener('click', function() {
+            farmerViewBtn.classList.add('active');
+            consumerViewBtn.classList.remove('active');
+            farmerView.classList.add('active');
+            consumerView.classList.remove('active');
+        });
+    }
+}
+
+// =====================
+// Farmer Product Management
+// =====================
+let farmerProducts = [];
+
+function setupFarmerForm() {
+    const addProductForm = document.getElementById('addProductForm');
+    
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            addNewProduct();
+        });
+    }
+
+    // Setup edit and delete buttons for existing products
+    setupProductManagementButtons();
+}
+
+function addNewProduct() {
+    const productName = document.getElementById('productName').value;
+    const productCategory = document.getElementById('productCategory').value;
+    const productPrice = document.getElementById('productPrice').value;
+    const productQuantity = document.getElementById('productQuantity').value;
+    const productDescription = document.getElementById('productDescription').value;
+
+    // Create product object
+    const product = {
+        id: Date.now(),
+        name: productName,
+        category: productCategory,
+        price: productPrice,
+        quantity: productQuantity,
+        description: productDescription,
+        seller: 'ghimirepratik1100'
+    };
+
+    // Add to products array
+    farmerProducts.push(product);
+
+    // Add to farmer's product list
+    addToFarmerProductList(product);
+
+    // Add to consumer view
+    addToConsumerView(product);
+
+    // Show success message
+    showNotification(
+        currentLang === 'en' ? 
+        'Product added successfully!' : 
+        'उत्पादन सफलतापूर्वक थपियो!',
+        'success'
+    );
+
+    // Reset form
+    document.getElementById('addProductForm').reset();
+}
+
+function addToFarmerProductList(product) {
+    const farmerProductsList = document.getElementById('farmerProductsList');
+    
+    const productItem = document.createElement('div');
+    productItem.className = 'farmer-product-item';
+    productItem.dataset.productId = product.id;
+    productItem.innerHTML = `
+        <div class="product-item-info">
+            <div class="product-item-name">${product.name}</div>
+            <div class="product-item-details">
+                <span>NPR ${product.price}/kg</span>
+                <span>•</span>
+                <span>${product.quantity} kg available</span>
+            </div>
+        </div>
+        <div class="product-item-actions">
+            <button class="edit-btn" onclick="editProduct(${product.id})" data-en="Edit" data-ne="सम्पादन">Edit</button>
+            <button class="delete-btn" onclick="deleteProduct(${product.id})" data-en="Delete" data-ne="मेटाउनुहोस्">Delete</button>
+        </div>
+    `;
+    
+    farmerProductsList.appendChild(productItem);
+}
+
+function addToConsumerView(product) {
+    const productGrid = document.getElementById('productGrid');
+    
+    // Category emoji mapping
+    const categoryEmoji = {
+        'vegetables': '🥬',
+        'fruits': '🍎',
+        'grains': '🌾',
+        'other': '📦'
+    };
+
+    const productCard = document.createElement('div');
+    productCard.className = 'product-card';
+    productCard.dataset.category = product.category;
+    productCard.dataset.productId = product.id;
+    productCard.innerHTML = `
+        <div class="product-image">${categoryEmoji[product.category] || '📦'}</div>
+        <div class="product-info">
+            <div class="product-category">${product.category.charAt(0).toUpperCase() + product.category.slice(1)}</div>
+            <div class="product-name">${product.name}</div>
+            <div class="product-details">
+                <span data-en="Available: ${product.quantity} kg" data-ne="उपलब्ध: ${product.quantity} किलो">Available: ${product.quantity} kg</span>
+            </div>
+            <div class="product-price">NPR ${product.price}/kg</div>
+            <div class="product-seller" data-en="Seller: ${product.seller}" data-ne="बिक्रेता: ${product.seller}">Seller: ${product.seller}</div>
+            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+        </div>
+    `;
+    
+    productGrid.appendChild(productCard);
+    
+    // Setup button for new product
+    const addToCartBtn = productCard.querySelector('.product-btn');
+    addToCartBtn.addEventListener('click', function() {
+        const productName = productCard.querySelector('.product-name').textContent;
+        alert(currentLang === 'en' ? 
+            `"${productName}" added to cart!` : 
+            `"${productName}" कार्टमा थपियो!`);
+        addToCart(productName);
+    });
+}
+
+function editProduct(productId) {
+    const product = farmerProducts.find(p => p.id === productId);
+    if (product) {
+        // Pre-fill form with product data
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productCategory').value = product.category;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productQuantity').value = product.quantity;
+        document.getElementById('productDescription').value = product.description;
+
+        // Delete the old product
+        deleteProduct(productId);
+
+        // Scroll to form
+        document.querySelector('.add-product-section').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function deleteProduct(productId) {
+    // Remove from array
+    farmerProducts = farmerProducts.filter(p => p.id !== productId);
+
+    // Remove from farmer's list
+    const farmerItem = document.querySelector(`.farmer-product-item[data-product-id="${productId}"]`);
+    if (farmerItem) {
+        farmerItem.remove();
+    }
+
+    // Remove from consumer view
+    const consumerCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+    if (consumerCard) {
+        consumerCard.remove();
+    }
+
+    showNotification(
+        currentLang === 'en' ? 
+        'Product deleted successfully!' : 
+        'उत्पादन सफलतापूर्वक मेटियो!',
+        'success'
+    );
+}
+
+function setupProductManagementButtons() {
+    // This will be called after dynamic products are added
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('edit-btn')) {
+            const productItem = e.target.closest('.farmer-product-item');
+            const productId = parseInt(productItem.dataset.productId);
+            editProduct(productId);
+        }
+        
+        if (e.target.classList.contains('delete-btn')) {
+            const productItem = e.target.closest('.farmer-product-item');
+            const productId = parseInt(productItem.dataset.productId);
+            const confirmed = confirm(currentLang === 'en' ? 
+                'Are you sure you want to delete this product?' : 
+                'के तपाईं यो उत्पादन मेटाउन चाहनुहुन्छ?');
+            if (confirmed) {
+                deleteProduct(productId);
+            }
+        }
+    });
 }
 
 // =====================
