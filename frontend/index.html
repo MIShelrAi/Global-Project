@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Krishi - डिजिटल कृषि</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./landing.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Digital Krishi</h1>
+                    <p>डिजिटल कृषि</p>
+                </div>
+            </div>
+
+            <nav id="desktopNav">
+                <a href="#home" data-translate="nav-home">Home</a>
+                <a href="#about" data-translate="nav-about">About</a>
+                <a href="#services" data-translate="nav-services">Services</a>
+                <a href="#products" data-translate="nav-products">Products</a>
+                <a href="#contact" data-translate="nav-contact">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="lang-btn" id="langBtn">
+                    <i class="fas fa-globe"></i>
+                    <span id="langText">नेपाली</span>
+                </button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars" id="menuIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <nav class="mobile-nav" id="mobileNav">
+            <a href="#home" data-translate="nav-home">Home</a>
+            <a href="#about" data-translate="nav-about">About</a>
+            <a href="#services" data-translate="nav-services">Services</a>
+            <a href="#products" data-translate="nav-products">Products</a>
+            <a href="#contact" data-translate="nav-contact">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-pattern"></div>
+        <div class="hero-container">
+            <h2 data-translate="hero-title">Growing Together</h2>
+            <p data-translate="hero-subtitle">Empowering Farmers with Modern Agricultural Solutions</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" data-translate="hero-cta">Get Started</button>
+                <button class="btn-secondary btn-demo" data-translate="hero-learn"><i class="fas fa-play-circle"></i> Watch a Demo</button>
+            </div>
+        </div>
+        <svg class="wave-divider" viewBox="0 0 1440 120" fill="none">
+            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#FFFBEB"/>
+        </svg>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-grid">
+                <div>
+                    <h2 class="section-title" data-translate="about-title">About Digital Krishi</h2>
+                    <p class="section-text" data-translate="about-desc">We are dedicated to transforming agriculture through technology and sustainable practices. Our mission is to empower farmers with knowledge, tools, and resources to increase productivity while preserving our precious environment.</p>
+                    <div class="mission-box">
+                        <h3 data-translate="about-mission">Our Mission</h3>
+                        <p data-translate="about-mission-text">To bridge the gap between traditional farming wisdom and modern agricultural technology.</p>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-outer">
+                        <div class="stats-inner">
+                            <i class="fas fa-leaf stats-icon"></i>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <p class="stat-number">500+</p>
+                                    <p class="stat-label" data-translate="stat-farmers">Farmers</p>
+                                </div>
+                                <div class="stat-item">
+                                    <p class="stat-number">50+</p>
+                                    <p class="stat-label" data-translate="stat-products">Products</p>
+                                </div>
+                                <div class="stat-item">
+                                    <p class="stat-number">10+</p>
+                                    <p class="stat-label" data-translate="stat-districts">Districts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="section bg-white">
+        <div class="container">
+            <h2 class="section-title text-center" data-translate="services-title">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="service-title" data-translate="service1-title">Expert Training</h3>
+                    <p class="service-desc" data-translate="service1-desc">Comprehensive workshops on modern farming techniques and sustainable practices.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3 class="service-title" data-translate="service2-title">Quality Seeds</h3>
+                    <p class="service-desc" data-translate="service2-desc">Premium quality seeds and organic fertilizers for better yields.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="service-title" data-translate="service3-title">Market Access</h3>
+                    <p class="service-desc" data-translate="service3-desc">Connect farmers directly with buyers for fair pricing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <!-- <section id="products" class="section bg-green">
+        <div class="container">
+            <h2 class="section-title text-center" data-translate="products-title">Featured Products</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name" data-translate="product1-name">Organic Fertilizer</h3>
+                        <p class="product-price" data-translate="product1-price">Rs. 1,200/bag</p>
+                        <button class="product-btn" data-translate="order-btn">Order Now</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name" data-translate="product2-name">Hybrid Seeds</h3>
+                        <p class="product-price" data-translate="product2-price">Rs. 800/kg</p>
+                        <button class="product-btn" data-translate="order-btn">Order Now</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name" data-translate="product3-name">Bio Pesticides</h3>
+                        <p class="product-price" data-translate="product3-price">Rs. 600/ltr</p>
+                        <button class="product-btn" data-translate="order-btn">Order Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title" style="border: none; padding: 0;" data-translate="contact-title">Get In Touch</h2>
+                <p class="section-text" data-translate="contact-subtitle">Have questions? We'd love to hear from you.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-form">
+                    <input type="text" class="form-input" id="nameInput" data-translate-placeholder="contact-name" placeholder="Your Name">
+                    <input type="email" class="form-input" id="emailInput" data-translate-placeholder="contact-email" placeholder="Your Email">
+                    <textarea class="form-input" id="messageInput" data-translate-placeholder="contact-message" placeholder="Your Message"></textarea>
+                    <button class="submit-btn" id="submitBtn" data-translate="contact-send">Send Message</button>
+                </div>
+                <div class="contact-info">
+                    <div class="info-card">
+                        <i class="fas fa-map-marker-alt info-icon"></i>
+                        <div>
+                            <h3 class="info-title" data-translate="address-label">Address</h3>
+                            <p class="info-text" data-translate="contact-address">Kathmandu, Nepal</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-phone info-icon"></i>
+                        <div>
+                            <h3 class="info-title" data-translate="phone-label">Phone</h3>
+                            <p class="info-text" data-translate="contact-phone">+977-1-XXXXXXX</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-envelope info-icon"></i>
+                        <div>
+                            <h3 class="info-title" data-translate="email-label">Email</h3>
+                            <p class="info-text">info@digitalkrishi.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="logo-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Digital Krishi</h3>
+                    </div>
+                    <p data-translate="footer-tagline">Cultivating a sustainable future for Nepali farmers</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-translate="footer-links">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home" data-translate="nav-home">Home</a></li>
+                        <li><a href="#about" data-translate="nav-about">About</a></li>
+                        <li><a href="#services" data-translate="nav-services">Services</a></li>
+                        <li><a href="#products" data-translate="nav-products">Products</a></li>
+                        <li><a href="#contact" data-translate="nav-contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3 data-translate="footer-social">Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer-copyright">© 2026 Digital Krishi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./landing.js"></script>
+</body>
+</html>
