@@ -40,10 +40,6 @@
                 <span>🛒</span>
                 <span data-en="Marketplace" data-ne="बजार">Marketplace</span>
             </button>
-            <button class="nav-tab" data-tab="community">
-                <span>💬</span>
-                <span data-en="Help & Community" data-ne="सहायता र समुदाय">Help & Community</span>
-            </button>
         </div>
     </div>
 
@@ -119,131 +115,330 @@
         <div id="marketplace" class="tab-content">
             <h2 class="section-title" data-en="Agricultural Marketplace" data-ne="कृषि बजार">Agricultural Marketplace</h2>
             
-            <div class="marketplace-filters">
-                <button class="filter-btn active" data-en="All Products" data-ne="सबै उत्पादन">All Products</button>
-                <button class="filter-btn" data-en="Seeds" data-ne="बीउ">Seeds</button>
-                <button class="filter-btn" data-en="Fertilizers" data-ne="मल">Fertilizers</button>
-                <button class="filter-btn" data-en="Pesticides" data-ne="कीटनाशक">Pesticides</button>
-                <button class="filter-btn" data-en="Tools" data-ne="औजार">Tools</button>
+            <!-- User Role Toggle -->
+            <div class="role-toggle">
+                <button class="role-btn active" id="consumerViewBtn" data-en="🛒 Consumer View" data-ne="🛒 उपभोक्ता दृश्य">🛒 Consumer View</button>
+                <button class="role-btn" id="farmerViewBtn" data-en="🌾 Farmer View" data-ne="🌾 किसान दृश्य">🌾 Farmer View</button>
             </div>
 
-            <div class="product-grid">
-                <div class="product-card">
-                    <div class="product-image">🌱</div>
-                    <div class="product-info">
-                        <div class="product-category" data-en="Seeds" data-ne="बीउ">Seeds</div>
-                        <div class="product-name" data-en="Hybrid Tomato Seeds" data-ne="हाइब्रिड टमाटर बीउ">Hybrid Tomato Seeds</div>
-                        <div class="product-price">NPR 450</div>
-                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
-                    </div>
+            <!-- Consumer View -->
+            <div id="consumerView" class="marketplace-view active">
+                <div class="marketplace-filters">
+                    <button class="filter-btn active" data-category="all" data-en="All Products" data-ne="सबै उत्पादन">All Products</button>
+                    <button class="filter-btn" data-category="vegetables" data-en="Vegetables" data-ne="तरकारी">Vegetables</button>
+                    <button class="filter-btn" data-category="fruits" data-en="Fruits" data-ne="फलफूल">Fruits</button>
+                    <button class="filter-btn" data-category="grains" data-en="Grains" data-ne="अन्न">Grains</button>
                 </div>
 
-                <div class="product-card">
-                    <div class="product-image">🧪</div>
-                    <div class="product-info">
-                        <div class="product-category" data-en="Fertilizers" data-ne="मल">Fertilizers</div>
-                        <div class="product-name" data-en="Organic Compost" data-ne="जैविक मल">Organic Compost</div>
-                        <div class="product-price">NPR 850</div>
-                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                <div class="product-grid" id="productGrid">
+                    <!-- Sample products - will be populated dynamically -->
+                    <div class="product-card" data-category="vegetables">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop" alt="Fresh Tomatoes" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Vegetables" data-ne="तरकारी">Vegetables</div>
+                            <div class="product-name" data-en="Fresh Tomatoes" data-ne="ताजा टमाटर">Fresh Tomatoes</div>
+                            <div class="product-details">
+                                <span data-en="Available: 50 kg" data-ne="उपलब्ध: ५० किलो">Available: 50 kg</span>
+                            </div>
+                            <div class="product-price">NPR 80/kg</div>
+                            <div class="product-seller" data-en="Seller: Ram Bahadur" data-ne="बिक्रेता: राम बहादुर">Seller: Ram Bahadur</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="product-card">
-                    <div class="product-image">🛡️</div>
-                    <div class="product-info">
-                        <div class="product-category" data-en="Pesticides" data-ne="कीटनाशक">Pesticides</div>
-                        <div class="product-name" data-en="Bio Pesticide Spray" data-ne="जैविक कीटनाशक स्प्रे">Bio Pesticide Spray</div>
-                        <div class="product-price">NPR 1,200</div>
-                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    <div class="product-card" data-category="vegetables">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=300&fit=crop" alt="Organic Potatoes" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Vegetables" data-ne="तरकारी">Vegetables</div>
+                            <div class="product-name" data-en="Organic Potatoes" data-ne="जैविक आलु">Organic Potatoes</div>
+                            <div class="product-details">
+                                <span data-en="Available: 100 kg" data-ne="उपलब्ध: १०० किलो">Available: 100 kg</span>
+                            </div>
+                            <div class="product-price">NPR 60/kg</div>
+                            <div class="product-seller" data-en="Seller: Sita Kumari" data-ne="बिक्रेता: सीता कुमारी">Seller: Sita Kumari</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="product-card">
-                    <div class="product-image">⚒️</div>
-                    <div class="product-info">
-                        <div class="product-category" data-en="Tools" data-ne="औजार">Tools</div>
-                        <div class="product-name" data-en="Garden Tool Set" data-ne="बगैचा औजार सेट">Garden Tool Set</div>
-                        <div class="product-price">NPR 2,500</div>
-                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=300&fit=crop" alt="Mountain Apples" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Mountain Apples" data-ne="पहाडी स्याउ">Mountain Apples</div>
+                            <div class="product-details">
+                                <span data-en="Available: 30 kg" data-ne="उपलब्ध: ३० किलो">Available: 30 kg</span>
+                            </div>
+                            <div class="product-price">NPR 150/kg</div>
+                            <div class="product-seller" data-en="Seller: Krishna Thapa" data-ne="बिक्रेता: कृष्ण थापा">Seller: Krishna Thapa</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="vegetables">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop" alt="Fresh Carrots" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Vegetables" data-ne="तरकारी">Vegetables</div>
+                            <div class="product-name" data-en="Fresh Carrots" data-ne="ताजा गाजर">Fresh Carrots</div>
+                            <div class="product-details">
+                                <span data-en="Available: 45 kg" data-ne="उपलब्ध: ४५ किलो">Available: 45 kg</span>
+                            </div>
+                            <div class="product-price">NPR 70/kg</div>
+                            <div class="product-seller" data-en="Seller: Hari Prasad" data-ne="बिक्रेता: हरि प्रसाद">Seller: Hari Prasad</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="vegetables">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&h=300&fit=crop" alt="Green Cabbage" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Vegetables" data-ne="तरकारी">Vegetables</div>
+                            <div class="product-name" data-en="Green Cabbage" data-ne="हरियो बन्दाकोपी">Green Cabbage</div>
+                            <div class="product-details">
+                                <span data-en="Available: 35 kg" data-ne="उपलब्ध: ३५ किलो">Available: 35 kg</span>
+                            </div>
+                            <div class="product-price">NPR 50/kg</div>
+                            <div class="product-seller" data-en="Seller: Maya Devi" data-ne="बिक्रेता: माया देवी">Seller: Maya Devi</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="vegetables">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=400&h=300&fit=crop" alt="Red Onions" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Vegetables" data-ne="तरकारी">Vegetables</div>
+                            <div class="product-name" data-en="Red Onions" data-ne="रातो प्याज">Red Onions</div>
+                            <div class="product-details">
+                                <span data-en="Available: 80 kg" data-ne="उपलब्ध: ८० किलो">Available: 80 kg</span>
+                            </div>
+                            <div class="product-price">NPR 90/kg</div>
+                            <div class="product-seller" data-en="Seller: Dipak Gurung" data-ne="बिक्रेता: दीपक गुरुङ">Seller: Dipak Gurung</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=300&fit=crop" alt="Fresh Bananas" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Fresh Bananas" data-ne="ताजा केरा">Fresh Bananas</div>
+                            <div class="product-details">
+                                <span data-en="Available: 60 kg" data-ne="उपलब्ध: ६० किलो">Available: 60 kg</span>
+                            </div>
+                            <div class="product-price">NPR 80/kg</div>
+                            <div class="product-seller" data-en="Seller: Shyam Tamang" data-ne="बिक्रेता: श्याम तामाङ">Seller: Shyam Tamang</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1547514701-42782101795e?w=400&h=300&fit=crop" alt="Juicy Oranges" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Juicy Oranges" data-ne="रसिलो सुन्तला">Juicy Oranges</div>
+                            <div class="product-details">
+                                <span data-en="Available: 50 kg" data-ne="उपलब्ध: ५० किलो">Available: 50 kg</span>
+                            </div>
+                            <div class="product-price">NPR 120/kg</div>
+                            <div class="product-seller" data-en="Seller: Radha Pokharel" data-ne="बिक्रेता: राधा पोखरेल">Seller: Radha Pokharel</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1601275618422-ae219ae59fc4?w=400&h=300&fit=crop" alt="Fresh Grapes" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Fresh Grapes" data-ne="ताजा अंगुर">Fresh Grapes</div>
+                            <div class="product-details">
+                                <span data-en="Available: 25 kg" data-ne="उपलब्ध: २५ किलो">Available: 25 kg</span>
+                            </div>
+                            <div class="product-price">NPR 250/kg</div>
+                            <div class="product-seller" data-en="Seller: Bhim Subedi" data-ne="बिक्रेता: भिम सुवेदी">Seller: Bhim Subedi</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1621583441131-eb345f7c66e4?w=400&h=300&fit=crop" alt="Sweet Watermelon" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Sweet Watermelon" data-ne="मिठो तरबुज">Sweet Watermelon</div>
+                            <div class="product-details">
+                                <span data-en="Available: 100 kg" data-ne="उपलब्ध: १०० किलो">Available: 100 kg</span>
+                            </div>
+                            <div class="product-price">NPR 45/kg</div>
+                            <div class="product-seller" data-en="Seller: Durga Chaudhary" data-ne="बिक्रेता: दुर्गा चौधरी">Seller: Durga Chaudhary</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&h=300&fit=crop" alt="Strawberries" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Strawberries" data-ne="स्ट्रबेरी">Strawberries</div>
+                            <div class="product-details">
+                                <span data-en="Available: 10 kg" data-ne="उपलब्ध: १० किलो">Available: 10 kg</span>
+                            </div>
+                            <div class="product-price">NPR 500/kg</div>
+                            <div class="product-seller" data-en="Seller: Suresh Lama" data-ne="बिक्रेता: सुरेश लामा">Seller: Suresh Lama</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="fruits">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&h=300&fit=crop" alt="Ripe Mangoes" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Fruits" data-ne="फलफूल">Fruits</div>
+                            <div class="product-name" data-en="Ripe Mangoes" data-ne="पाकेको आँप">Ripe Mangoes</div>
+                            <div class="product-details">
+                                <span data-en="Available: 40 kg" data-ne="उपलब्ध: ४० किलो">Available: 40 kg</span>
+                            </div>
+                            <div class="product-price">NPR 180/kg</div>
+                            <div class="product-seller" data-en="Seller: Kamal Adhikari" data-ne="बिक्रेता: कमल अधिकारी">Seller: Kamal Adhikari</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="grains">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=300&fit=crop" alt="Organic Rice" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Grains" data-ne="अन्न">Grains</div>
+                            <div class="product-name" data-en="Organic Rice" data-ne="जैविक चामल">Organic Rice</div>
+                            <div class="product-details">
+                                <span data-en="Available: 200 kg" data-ne="उपलब्ध: २०० किलो">Available: 200 kg</span>
+                            </div>
+                            <div class="product-price">NPR 85/kg</div>
+                            <div class="product-seller" data-en="Seller: Nabin Khadka" data-ne="बिक्रेता: नबिन खड्का">Seller: Nabin Khadka</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="grains">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop" alt="Whole Wheat" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Grains" data-ne="अन्न">Grains</div>
+                            <div class="product-name" data-en="Whole Wheat" data-ne="पुरा गहुँ">Whole Wheat</div>
+                            <div class="product-details">
+                                <span data-en="Available: 150 kg" data-ne="उपलब्ध: १५० किलो">Available: 150 kg</span>
+                            </div>
+                            <div class="product-price">NPR 70/kg</div>
+                            <div class="product-seller" data-en="Seller: Indra Magar" data-ne="बिक्रेता: इन्द्र मगर">Seller: Indra Magar</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="grains">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&h=300&fit=crop" alt="Sweet Corn" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Grains" data-ne="अन्न">Grains</div>
+                            <div class="product-name" data-en="Sweet Corn" data-ne="मिठो मकै">Sweet Corn</div>
+                            <div class="product-details">
+                                <span data-en="Available: 80 kg" data-ne="उपलब्ध: ८० किलो">Available: 80 kg</span>
+                            </div>
+                            <div class="product-price">NPR 60/kg</div>
+                            <div class="product-seller" data-en="Seller: Santosh Rana" data-ne="बिक्रेता: सन्तोष राणा">Seller: Santosh Rana</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="grains">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1607623488235-e2e3c31e0c93?w=400&h=300&fit=crop" alt="Red Lentils" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Grains" data-ne="अन्न">Grains</div>
+                            <div class="product-name" data-en="Red Lentils" data-ne="रातो दाल">Red Lentils</div>
+                            <div class="product-details">
+                                <span data-en="Available: 120 kg" data-ne="उपलब्ध: १२० किलो">Available: 120 kg</span>
+                            </div>
+                            <div class="product-price">NPR 140/kg</div>
+                            <div class="product-seller" data-en="Seller: Gita Ghimire" data-ne="बिक्रेता: गीता घिमिरे">Seller: Gita Ghimire</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="product-card" data-category="grains">
+                        <div class="product-image"><img src="https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&h=300&fit=crop" alt="Black Beans" class="product-img"></div>
+                        <div class="product-info">
+                            <div class="product-category" data-en="Grains" data-ne="अन्न">Grains</div>
+                            <div class="product-name" data-en="Black Beans" data-ne="कालो मास">Black Beans</div>
+                            <div class="product-details">
+                                <span data-en="Available: 90 kg" data-ne="उपलब्ध: ९० किलो">Available: 90 kg</span>
+                            </div>
+                            <div class="product-price">NPR 160/kg</div>
+                            <div class="product-seller" data-en="Seller: Mohan Rijal" data-ne="बिक्रेता: मोहन रिजाल">Seller: Mohan Rijal</div>
+                            <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Community Tab -->
-        <div id="community" class="tab-content">
-            <h2 class="section-title" data-en="Community & Support" data-ne="समुदाय र समर्थन">Community & Support</h2>
-            
-            <div class="community-section">
-                <div class="forum-section">
-                    <h3 style="margin-bottom: 1.5rem;" data-en="Recent Discussions" data-ne="हालका छलफल">Recent Discussions</h3>
-                    
-                    <div class="post-card">
-                        <div class="post-header">
-                            <span class="post-author">Ramesh Kumar</span>
-                            <span class="post-time">2 hours ago</span>
+            <!-- Farmer View -->
+            <div id="farmerView" class="marketplace-view">
+                <div class="farmer-panel">
+                    <div class="add-product-section">
+                        <h3 data-en="Add New Product" data-ne="नयाँ उत्पादन थप्नुहोस्">Add New Product</h3>
+                        <form id="addProductForm" class="product-form">
+                            <div class="form-group">
+                                <label data-en="Product Name" data-ne="उत्पादनको नाम">Product Name</label>
+                                <input type="text" id="productName" placeholder="e.g., Fresh Tomatoes" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-en="Category" data-ne="श्रेणी">Category</label>
+                                <select id="productCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="vegetables" data-en="Vegetables" data-ne="तरकारी">Vegetables</option>
+                                    <option value="fruits" data-en="Fruits" data-ne="फलफूल">Fruits</option>
+                                    <option value="grains" data-en="Grains" data-ne="अन्न">Grains</option>
+                                    <option value="other" data-en="Other" data-ne="अन्य">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label data-en="Price (NPR/kg)" data-ne="मूल्य (NPR/kg)">Price (NPR/kg)</label>
+                                    <input type="number" id="productPrice" placeholder="80" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label data-en="Quantity (kg)" data-ne="मात्रा (kg)">Quantity (kg)</label>
+                                    <input type="number" id="productQuantity" placeholder="50" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-en="Description" data-ne="विवरण">Description</label>
+                                <textarea id="productDescription" rows="3" placeholder="Add details about your product..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-en="Product Image" data-ne="उत्पादन छवि">Product Image</label>
+                                <input type="file" id="productImage" accept="image/*">
+                            </div>
+
+                            <button type="submit" class="submit-btn" data-en="Add Product" data-ne="उत्पादन थप्नुहोस्">Add Product</button>
+                        </form>
+                    </div>
+
+                    <div class="farmer-products-section">
+                        <h3 data-en="My Products" data-ne="मेरो उत्पादनहरू">My Products</h3>
+                        <div id="farmerProductsList" class="farmer-products-list">
+                            <!-- Sample farmer's products -->
+                            <div class="farmer-product-item">
+                                <div class="product-item-info">
+                                    <div class="product-item-name">Fresh Tomatoes</div>
+                                    <div class="product-item-details">
+                                        <span>NPR 80/kg</span>
+                                        <span>•</span>
+                                        <span>50 kg available</span>
+                                    </div>
+                                </div>
+                                <div class="product-item-actions">
+                                    <button class="edit-btn" data-en="Edit" data-ne="सम्पादन">Edit</button>
+                                    <button class="delete-btn" data-en="Delete" data-ne="मेटाउनुहोस्">Delete</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="post-title" data-en="Best practices for tomato cultivation?" data-ne="टमाटर खेतीका लागि उत्तम अभ्यास?">Best practices for tomato cultivation?</div>
-                        <div class="post-content" data-en="Looking for advice on growing tomatoes in the current season..." data-ne="हालको मौसममा टमाटर उब्जाउने बारे सल्लाह खोज्दै...">Looking for advice on growing tomatoes in the current season...</div>
-                        <div class="post-actions">
-                            <button class="action-btn">👍 12</button>
-                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
-                        </div>
-                    </div>
-
-                    <div class="post-card">
-                        <div class="post-header">
-                            <span class="post-author">Sita Devi</span>
-                            <span class="post-time">5 hours ago</span>
-                        </div>
-                        <div class="post-title" data-en="Dealing with pest infestation" data-ne="कीट संक्रमणसँग व्यवहार">Dealing with pest infestation</div>
-                        <div class="post-content" data-en="Found small insects on my cabbage plants. Any organic solutions?" data-ne="मेरो बन्दाकोपीको बोटमा साना कीराहरू भेटिए। कुनै जैविक समाधान?">Found small insects on my cabbage plants. Any organic solutions?</div>
-                        <div class="post-actions">
-                            <button class="action-btn">👍 8</button>
-                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
-                        </div>
-                    </div>
-
-                    <div class="post-card">
-                        <div class="post-header">
-                            <span class="post-author">Krishna Bahadur</span>
-                            <span class="post-time">1 day ago</span>
-                        </div>
-                        <div class="post-title" data-en="Monsoon farming tips needed" data-ne="मनसुन खेती सुझाव चाहिन्छ">Monsoon farming tips needed</div>
-                        <div class="post-content" data-en="What crops grow best during the monsoon season in Nepal?" data-ne="नेपालमा मनसुन मौसममा कुन बालीहरू राम्रो उम्रन्छन्?">What crops grow best during the monsoon season in Nepal?</div>
-                        <div class="post-actions">
-                            <button class="action-btn">👍 15</button>
-                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="resources-panel">
-                    <h3 style="margin-bottom: 1rem;" data-en="Quick Resources" data-ne="द्रुत स्रोतहरू">Quick Resources</h3>
-                    
-                    <div class="resource-item">
-                        <div class="resource-title" data-en="📚 Farming Guides" data-ne="📚 खेती गाइडहरू">📚 Farming Guides</div>
-                        <div class="resource-desc" data-en="Comprehensive cultivation guides" data-ne="व्यापक खेती गाइडहरू">Comprehensive cultivation guides</div>
-                    </div>
-
-                    <div class="resource-item">
-                        <div class="resource-title" data-en="🎓 Video Tutorials" data-ne="🎓 भिडियो ट्यूटोरियल">🎓 Video Tutorials</div>
-                        <div class="resource-desc" data-en="Learn from expert farmers" data-ne="विशेषज्ञ किसानहरूबाट सिक्नुहोस्">Learn from expert farmers</div>
-                    </div>
-
-                    <div class="resource-item">
-                        <div class="resource-title" data-en="☁️ Weather Updates" data-ne="☁️ मौसम अद्यावधिक">☁️ Weather Updates</div>
-                        <div class="resource-desc" data-en="Local weather forecasts" data-ne="स्थानीय मौसम पूर्वानुमान">Local weather forecasts</div>
-                    </div>
-
-                    <div class="resource-item">
-                        <div class="resource-title" data-en="📞 Expert Helpline" data-ne="📞 विशेषज्ञ हेल्पलाइन">📞 Expert Helpline</div>
-                        <div class="resource-desc" data-en="Get agricultural advice" data-ne="कृषि सल्लाह प्राप्त गर्नुहोस्">Get agricultural advice</div>
-                    </div>
-
-                    <div class="resource-item">
-                        <div class="resource-title" data-en="💰 Subsidy Information" data-ne="💰 अनुदान जानकारी">💰 Subsidy Information</div>
-                        <div class="resource-desc" data-en="Government schemes & support" data-ne="सरकारी योजना र समर्थन">Government schemes & support</div>
                     </div>
                 </div>
             </div>
