@@ -1,8 +1,3 @@
-// ============================================
-// DIGITAL KRISHI - LOGIN AUTHENTICATION
-// ============================================
-
-// Get form elements
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -27,8 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (session) {
         currentUser = session.user;
         console.log('User already logged in:', currentUser.email);
-        // Redirect to dashboard if already logged in
-        window.location.href = './dashboard.html';
+        // Redirect to index if already logged in
+        window.location.href = './index.html';
         return;
     }
     
@@ -51,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSuccess('Login successful! Redirecting to dashboard...');
             
             setTimeout(() => {
-                window.location.href = './dashboard.html';
+                window.location.href = './index.html';
             }, 1500);
         } else if (event === 'SIGNED_OUT') {
             currentUser = null;
@@ -198,7 +193,7 @@ async function socialAuth(provider) {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: provider,
             options: {
-                redirectTo: APP_CONFIG?.auth?.redirectUrl || `${window.location.origin}/dashboard.html`
+                redirectTo: APP_CONFIG?.auth?.redirectUrl || `${window.location.origin}/index.html`
             }
         });
 

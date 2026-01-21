@@ -1,280 +1,180 @@
-
+// =============================================
+// AUTHENTICATION MODULE
+// =============================================
 
 class AuthManager {
     constructor() {
         this.supabase = window.supabaseClient;
-        this.currentUser = null;
-        this.userProfile = null;
+        this.user = null;
         this.init();
     }
 
     async init() {
-        // Check for existing session
+        // Check current session
         const { data: { session } } = await this.supabase.auth.getSession();
-        if (session) {
-            this.currentUser = session.user;
-            await this.loadUserProfile();
-        }
-
+        this.user = session?.user || null;
+        
         // Listen for auth changes
-        this.supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('Auth event:', event);
+        this.supabase.auth.onAuthStateChange((event, session) => {
+            this.user = session?.user || null;
+            this.updateUI();
             
-            if (event === 'SIGNED_IN' && session) {
-                this.currentUser = session.user;
-                await this.loadUserProfile();
-                this.updateUI();
-                
-                // Redirect if on auth page
-                if (window.location.pathname.includes('auth.html')) {
-                    window.location.href = 'index.html';
-                }
+            if (event === 'SIGNED_IN') {
+                this.onSignIn();
             } else if (event === 'SIGNED_OUT') {
-                this.currentUser = null;
-                this.userProfile = null;
-                this.updateUI();
-                
-                // Redirect to auth page
-                if (!window.location.pathname.includes('auth.html')) {
-                    window.location.href = 'auth.html';
-                }
+                this.onSignOut();
             }
         });
 
+        this.setupEventListeners();
         this.updateUI();
     }
 
-    async loadUserProfile() {
-        if (!this.currentUser) return;
-
-        const { data, error } = await this.supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', this.currentUser.id)
-            .single();
-
-        if (error) {
-            console.error('Error loading profile:', error);
-            return;
-        }
-
-        this.userProfile = data;
-    }
-
-    // ==========================================
-    // SIGN UP
-    // ==========================================
-    async signUp(email, password, fullName) {
-        try {
-            const { data, error } = await this.supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: fullName
-                    }
-                }
+    setupEventListeners() {
+        // Auth tabs
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.add('hidden'));
+                document.getElementById(`${tab.dataset.tab}-form`)?.classList.remove('hidden');
             });
+        });
 
-            if (error) throw error;
+        // Login form
+        document.getElementById('login-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.login();
+        });
 
-            return {
-                success: true,
-                message: 'Check your email to confirm your account!',
-                user: data.user
-            };
-        } catch (error) {
-            console.error('Signup error:', error);
-            return {
-                success: false,
-                message: error.message
-            };
-        }
+        // Signup form
+        document.getElementById('signup-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.signup();
+        });
+
+        // Social logins
+        document.getElementById('google-login')?.addEventListener('click', () => {
+            this.socialLogin('google');
+        });
+
+        document.getElementById('github-login')?.addEventListener('click', () => {
+            this.socialLogin('github');
+        });
+
+        // Logout
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            this.logout();
+        });
     }
 
-    // ==========================================
-    // SIGN IN
-    // ==========================================
-    async signIn(email, password) {
+    async login() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('login-error');
+
         try {
-            const { data, error } = await this.supabase.auth.signInWithPassword({
+            const { error } = await this.supabase.auth.signInWithPassword({
                 email,
                 password
             });
 
             if (error) throw error;
 
-            return {
-                success: true,
-                user: data.user
-            };
+            window.location.href = 'index.html';
         } catch (error) {
-            console.error('Login error:', error);
-            return {
-                success: false,
-                message: error.message
-            };
+            errorEl.textContent = error.message;
         }
     }
 
-    // ==========================================
-    // SOCIAL AUTH (Google, GitHub)
-    // ==========================================
-    async signInWithProvider(provider) {
+    async signup() {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const errorEl = document.getElementById('signup-error');
+
         try {
-            const { data, error } = await this.supabase.auth.signInWithOAuth({
-                provider: provider, // 'google', 'github', 'facebook'
+            const { data, error } = await this.supabase.auth.signUp({
+                email,
+                password,
                 options: {
-                    redirectTo: `${window.location.origin}/index.html`
+                    data: { full_name: name }
                 }
             });
 
             if (error) throw error;
-            return { success: true };
-        } catch (error) {
-            console.error('OAuth error:', error);
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
 
-    // ==========================================
-    // SIGN OUT
-    // ==========================================
-    async signOut() {
-        try {
-            const { error } = await this.supabase.auth.signOut();
-            if (error) throw error;
-            
-            window.location.href = 'auth.html';
-            return { success: true };
-        } catch (error) {
-            console.error('Logout error:', error);
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // ==========================================
-    // PASSWORD RESET
-    // ==========================================
-    async resetPassword(email) {
-        try {
-            const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password.html`
-            });
-
-            if (error) throw error;
-
-            return {
-                success: true,
-                message: 'Password reset email sent!'
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // ==========================================
-    // UPDATE PASSWORD
-    // ==========================================
-    async updatePassword(newPassword) {
-        try {
-            const { error } = await this.supabase.auth.updateUser({
-                password: newPassword
-            });
-
-            if (error) throw error;
-
-            return {
-                success: true,
-                message: 'Password updated successfully!'
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // ==========================================
-    // UPDATE PROFILE
-    // ==========================================
-    async updateProfile(updates) {
-        if (!this.currentUser) return { success: false, message: 'Not logged in' };
-
-        try {
-            const { error } = await this.supabase
-                .from('profiles')
-                .update({
-                    ...updates,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', this.currentUser.id);
-
-            if (error) throw error;
-
-            await this.loadUserProfile();
-            return { success: true };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // ==========================================
-    // UI HELPERS
-    // ==========================================
-    updateUI() {
-        const authButtons = document.getElementById('auth-buttons');
-        const userInfo = document.getElementById('user-info');
-        const protectedContent = document.querySelectorAll('.protected');
-
-        if (this.currentUser) {
-            // Show user info, hide auth buttons
-            if (authButtons) authButtons.style.display = 'none';
-            if (userInfo) {
-                userInfo.style.display = 'flex';
-                const userName = userInfo.querySelector('.user-name');
-                const userEmail = userInfo.querySelector('.user-email');
-                if (userName) userName.textContent = this.userProfile?.full_name || 'User';
-                if (userEmail) userEmail.textContent = this.currentUser.email;
+            // Create profile
+            if (data.user) {
+                await this.supabase.from('profiles').insert({
+                    id: data.user.id,
+                    email: email,
+                    full_name: name
+                });
             }
 
-            // Show protected content
-            protectedContent.forEach(el => el.style.display = 'block');
-        } else {
-            // Show auth buttons, hide user info
-            if (authButtons) authButtons.style.display = 'flex';
-            if (userInfo) userInfo.style.display = 'none';
-
-            // Hide protected content
-            protectedContent.forEach(el => el.style.display = 'none');
+            alert('Check your email for verification link!');
+        } catch (error) {
+            errorEl.textContent = error.message;
         }
+    }
+
+    async socialLogin(provider) {
+        try {
+            const { error } = await this.supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    redirectTo: window.location.origin + '/index.html'
+                }
+            });
+
+            if (error) throw error;
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    async logout() {
+        await this.supabase.auth.signOut();
+        window.location.href = 'index.html';
+    }
+
+    onSignIn() {
+        console.log('User signed in:', this.user?.email);
+    }
+
+    onSignOut() {
+        console.log('User signed out');
+    }
+
+    updateUI() {
+        const isLoggedIn = !!this.user;
+
+        document.querySelectorAll('.auth-required').forEach(el => {
+            el.style.display = isLoggedIn ? '' : 'none';
+        });
+
+        document.querySelectorAll('.guest-only').forEach(el => {
+            el.style.display = isLoggedIn ? 'none' : '';
+        });
+
+        if (isLoggedIn) {
+            document.querySelectorAll('.user-email').forEach(el => {
+                el.textContent = this.user.email;
+            });
+        }
+    }
+
+    getUser() {
+        return this.user;
     }
 
     isAuthenticated() {
-        return !!this.currentUser;
-    }
-
-    requireAuth() {
-        if (!this.currentUser) {
-            window.location.href = 'auth.html';
-            return false;
-        }
-        return true;
+        return !!this.user;
     }
 }
 
-// Initialize auth manager
+// Initialize
 window.authManager = new AuthManager();
+console.log('✅ Auth Manager initialized');
