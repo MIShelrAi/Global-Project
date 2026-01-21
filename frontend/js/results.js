@@ -2,15 +2,19 @@ class ResultsPage {
     constructor() {
         this.supabase = window.supabaseClient;
         this.geminiAI = window.geminiAI;
-        this.scanId = new URLSearchParams(window.location.search).get('id');
+        this.scanId = null;
         this.scanData = null;
         this.analysisData = null;
         this.init();
     }
 
     async init() {
+        // Try to get scan ID from URL first, then fallback to localStorage
+        this.scanId = new URLSearchParams(window.location.search).get('id');
+        
+        // If no scan ID, try to load from localStorage (for demo/client-side only)
         if (!this.scanId) {
-            this.showError('No scan ID provided');
+            this.loadFromLocalStorage();
             return;
         }
 
@@ -19,8 +23,45 @@ class ResultsPage {
             this.setupEventListeners();
         } catch (error) {
             console.error('Error loading results:', error);
-            this.showError(error.message);
+            window.location.href = 'index.html';
         }
+    }
+
+    loadFromLocalStorage() {
+        try {
+            // Get image data and scan results from localStorage
+            const imageData = localStorage.getItem('scannedImageData');
+            const scanResults = localStorage.getItem('scanResults');
+            
+            if (!imageData || !scanResults) {
+                // Don't show error if no data, just redirect back
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Create scan data from real AI analysis
+            this.scanData = {
+                id: 'demo-' + Date.now(),
+                image_url: imageData,
+                scan_date: new Date().toISOString(),
+                api_response: JSON.parse(scanResults)
+            };
+            
+            this.analysisData = this.scanData.api_response;
+            this.renderResults();
+            this.setupEventListeners();
+            
+        } catch (error) {
+            console.error('Error loading from localStorage:', error);
+            // Redirect back instead of showing error
+            window.location.href = 'index.html';
+        }
+    }
+
+    getMockAnalysisData() {
+        // This is now just a fallback - real data comes from Gemini AI
+        // Only used when AI service fails or no image data
+        return null;
     }
 
     async loadResults() {
@@ -625,13 +666,17 @@ Powered by Google Gemini
 
         const responseEl = document.getElementById('ask-response');
         responseEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> AI is thinking...</div>';
-
+        
         try {
-            const result = await this.geminiAI.askQuestion(
-                this.scanData.image_url,
-                question
-            );
-
+            // Get image data from scanData
+            const imageData = this.scanData?.image_url || localStorage.getItem('scannedImageData');
+            
+            if (!imageData) {
+                throw new Error('No image data available');
+            }
+            
+            const result = await window.geminiAI.askQuestion(imageData, question);
+            
             if (result.success) {
                 responseEl.innerHTML = `
                     <div class="ai-response">
@@ -650,9 +695,13 @@ Powered by Google Gemini
     }
 
     showError(message) {
-        document.getElementById('results-loading').classList.add('hidden');
-        document.getElementById('results-error').classList.remove('hidden');
-        document.getElementById('error-message').textContent = message;
+        const loadingEl = document.getElementById('results-loading');
+        const errorEl = document.getElementById('results-error');
+        const messageEl = document.getElementById('error-message');
+        
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (errorEl) errorEl.classList.remove('hidden');
+        if (messageEl) messageEl.textContent = message;
     }
 
     showNotification(message, type = 'info') {

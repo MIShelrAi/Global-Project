@@ -156,7 +156,12 @@ async function handleLogin(email, password) {
         }
 
         console.log('Login successful:', data);
-        // Auth state change listener will handle redirect
+        showSuccess('Login successful! Redirecting to dashboard...');
+        
+        // Immediate redirect to dashboard
+        window.location.href = './index.html';
+        
+        // Auth state change listener will also handle redirect (backup)
         
     } catch (error) {
         console.error('Login error:', error);

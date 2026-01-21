@@ -220,26 +220,62 @@ function resetUpload() {
         </button>
         <p class="file-support" data-en="Supports: JPG, PNG, WEBP (Max 10MB)" data-ne="समर्थन: JPG, PNG, WEBP (अधिकतम 10MB)">
             ${currentLang === 'en' ? 'Supports: JPG, PNG, WEBP (Max 10MB)' : 'समर्थन: JPG, PNG, WEBP (अधिकतम 10MB)'}
-        </p>
     `;
-    setupFileUpload();
 }
 
-function analyzeImage() {
-    alert(currentLang === 'en' ? 
-        'Image analysis started! This will be connected to the backend API.' : 
-        'छवि विश्लेषण सुरु भयो! यो ब्याकएन्ड API मा जडान हुनेछ।');
-    // This is where you would call your backend API to analyze the image
-    // Example: sendToBackendAPI(imageData);
-}
+async function analyzeImage() {
+    const uploadArea = document.getElementById('uploadArea');
+    const img = uploadArea.querySelector('img');
+    
+    if (!img) {
+        showNotification(
+            currentLang === 'en' ? 'Please upload an image first' : 'कृपया पहिले एउटा छवि अपलोड गर्नुहोस्',
+            'error'
+        );
+        return;
+    }
 
-function processImage(file) {
-    // Placeholder for image processing logic
-    console.log('Processing image:', file.name);
-    // This would typically involve:
-    // 1. Sending image to backend API
-    // 2. Receiving disease detection results
-    // 3. Displaying results to user
+    try {
+        // Show loading state
+        showLoading(currentLang === 'en' ? 'Analyzing image...' : 'छवि विश्लेषण गर्दै...');
+        
+        // Store image data for results page
+        const imageData = img.src;
+        localStorage.setItem('scannedImageData', imageData);
+        
+        // Initialize Gemini AI if available
+        if (window.geminiAI) {
+            const result = await window.geminiAI.analyzePlant(imageData);
+            
+            if (result.success) {
+                // Store analysis results
+                localStorage.setItem('scanResults', JSON.stringify(result.data));
+                hideLoading();
+                // Redirect to results page
+                window.location.href = 'results.html';
+            } else {
+                throw new Error(result.error || 'Analysis failed');
+            }
+        } else {
+            // Fallback: redirect without analysis for demo
+            hideLoading();
+            showNotification(
+                currentLang === 'en' ? 'AI service not available. Showing demo results.' : 'AI सेवा उपलब्ध छैन। डेमो परिणामहरू देखाउँदै।',
+                'info'
+            );
+            setTimeout(() => {
+                window.location.href = 'results.html';
+            }, 2000);
+        }
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Analysis error:', error);
+        showNotification(
+            currentLang === 'en' ? `Analysis failed: ${error.message}` : `विश्लेषण असफल: ${error.message}`,
+            'error'
+        );
+    }
 }
 
 // =====================

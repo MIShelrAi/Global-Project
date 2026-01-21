@@ -5,7 +5,7 @@ const CONFIG = {
     SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwaHhsdm53aXJ5c3R3d3l3cHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5ODM2MDgsImV4cCI6MjA4NDU1OTYwOH0._aoHGnZKhsvS_cAJqo5xDWokwNNw9m7yPIBn9TxMPQ8',
     
     // Google Gemini API
-    GEMINI_API_KEY: 'YOUR_PLANT_ID_API_KEY',
+    GEMINI_API_KEY: 'AIzaSyAFZOhyrTFVyxNUkDhYzb0DV1cNwmeIHCw',
     GEMINI_MODEL: 'gemini-1.5-pro',
     
     // App Settings
@@ -17,9 +17,6 @@ const CONFIG = {
         redirectUrl: `${window.location.origin}/index.html`,
         passwordMinLength: 6
     },
-    
-    // Plant ID API
-    plantIdApi: 'https://api.plant.id/v3/health_assessment',
     
     // Scan limits
     scanLimits: {

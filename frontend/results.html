@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Krishi - Disease Detection Results</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="results.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo"><img src="./images/image.png" alt="."></div>
+            <div>
+                <div class="brand-name" data-en="Digital Krishi" data-ne="डिजिटल कृषि">Digital Krishi</div>
+                <div style="font-size: 0.8rem; opacity: 0.9;" data-en="Plant Disease Analysis" data-ne="बिरुवा रोग विश्लेषण">Plant Disease Analysis</div>
+            </div>
+        </div>
+        <div class="user-section">
+            <div class="controls">
+                <button class="btn-icon" id="themeToggle">🌙</button>
+                <button class="btn-icon" id="langToggle">🌐 EN</button>
+            </div>
+            <button class="back-btn" data-en="Back to Scanner" data-ne="स्क्यानरमा फर्कनुहोस्">Back to Scanner</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-container">
+            <div class="loading-spinner"></div>
+            <h2 data-en="Analyzing Plant Image..." data-ne="बिरुवा छवि विश्लेषण गर्दै...">Analyzing Plant Image...</h2>
+            <p data-en="Our AI is examining your plant for disease detection" data-ne="हाम्रो AI तपाईंको बिरुवालाई रोग पत्ता लगाउन जाँच गर्दैछ">Our AI is examining your plant for disease detection</p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <!-- Image Preview -->
+            <div class="image-preview-section">
+                <h3 data-en="Scanned Image" data-ne="स्क्यान गरिएको छवि">Scanned Image</h3>
+                <div class="image-preview">
+                    <img id="scannedImage" src="" alt="Scanned plant image">
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="analysis-section">
+                <h3 data-en="Analysis Results" data-ne="विश्लेषण परिणामहरू">Analysis Results</h3>
+                
+                <div id="diseaseStatus" class="status-card">
+                    <!-- Status will be populated by JavaScript -->
+                </div>
+
+                <div id="diseaseDetails" class="details-card">
+                    <!-- Disease details will be populated by JavaScript -->
+                </div>
+
+                <div id="treatmentRecommendations" class="treatment-card">
+                    <!-- Treatment recommendations will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions-section">
+                <button class="action-btn primary" id="scanNewBtn" data-en="Scan New Image" data-ne="नयाँ छवि स्क्यान गर्नुहोस्">Scan New Image</button>
+                <button class="action-btn secondary" id="saveResultsBtn" data-en="Save Results" data-ne="परिणामहरू बचत गर्नुहोस्">Save Results</button>
+                <button class="action-btn secondary" id="shareResultsBtn" data-en="Share Results" data-ne="परिणामहरू सेयर गर्नुहोस्">Share Results</button>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-container" style="display: none;">
+            <div class="error-icon">⚠️</div>
+            <h2 data-en="Analysis Failed" data-ne="विश्लेषण असफल">Analysis Failed</h2>
+            <p id="errorMessage" data-en="Unable to analyze the image. Please try again." data-ne="छवि विश्लेषण गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।">Unable to analyze the image. Please try again.</p>
+            <button class="action-btn primary" id="retryBtn" data-en="Try Again" data-ne="फेरि प्रयास गर्नुहोस्">Try Again</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/gemini-ai.js"></script>
+    <script src="js/results.js"></script>
+</body>
+</html>

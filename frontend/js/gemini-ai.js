@@ -154,7 +154,7 @@ Important instructions:
     // CALL GEMINI VISION API
     // =========================================
     async callGeminiVision(prompt, imageBase64, mimeType) {
-        const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
         const requestBody = {
             contents: [
@@ -472,7 +472,7 @@ Return ONLY the JSON object.`;
     // =========================================
     async getCareTips(plantName) {
         try {
-            const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
             const prompt = `Provide detailed care tips for ${plantName}. Return as JSON:
 {
