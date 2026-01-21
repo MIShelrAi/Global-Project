@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Krishi - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo">🌾</div>
+            <div>
+                <div class="brand-name" data-en="Digital Krishi" data-ne="डिजिटल कृषि">Digital Krishi</div>
+                <div style="font-size: 0.8rem; opacity: 0.9;" data-en="Welcome back, ghimirepratik1100!" data-ne="स्वागत छ, ghimirepratik1100!">Welcome back, ghimirepratik1100!</div>
+            </div>
+        </div>
+        <div class="user-section">
+            <div class="controls">
+                <button class="btn-icon" id="themeToggle">🌙</button>
+                <button class="btn-icon" id="langToggle">🌐 EN</button>
+            </div>
+            <button class="logout-btn" data-en="Logout" data-ne="बाहिर निस्कनुहोस्">Logout</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="scanner">
+                <span>🔍</span>
+                <span data-en="Disease Scanner" data-ne="रोग स्क्यानर">Disease Scanner</span>
+            </button>
+            <button class="nav-tab" data-tab="history">
+                <span>📋</span>
+                <span data-en="History" data-ne="इतिहास">History</span>
+            </button>
+            <button class="nav-tab" data-tab="marketplace">
+                <span>🛒</span>
+                <span data-en="Marketplace" data-ne="बजार">Marketplace</span>
+            </button>
+            <button class="nav-tab" data-tab="community">
+                <span>💬</span>
+                <span data-en="Help & Community" data-ne="सहायता र समुदाय">Help & Community</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Disease Scanner Tab -->
+        <div id="scanner" class="tab-content active">
+            <div class="scanner-section">
+                <h1 class="scanner-title" data-en="Crop Disease Scanner" data-ne="बाली रोग स्क्यानर">Crop Disease Scanner</h1>
+                <p class="scanner-subtitle" data-en="Upload or capture an image of your crop to identify diseases and get treatment recommendations" data-ne="रोगहरू पहिचान गर्न र उपचार सिफारिसहरू प्राप्त गर्न आफ्नो बालीको छवि अपलोड वा क्याप्चर गर्नुहोस्">Upload or capture an image of your crop to identify diseases and get treatment recommendations</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon"></div>
+                    <h3 class="upload-title" data-en="Upload Crop Image" data-ne="बाली छवि अपलोड गर्नुहोस्">Upload Crop Image</h3>
+                    <p class="upload-subtitle" data-en="Take a clear photo of the affected plant or upload an existing image" data-ne="प्रभावित बिरुवाको स्पष्ट फोटो लिनुहोस् वा अवस्थित छवि अपलोड गर्नुहोस्">Take a clear photo of the affected plant or upload an existing image</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button class="choose-btn" id="chooseBtn" data-en="Choose Image" data-ne="छवि छान्नुहोस्">Choose Image</button>
+                    <p class="file-support" data-en="Supports: JPG, PNG, WEBP (Max 10MB)" data-ne="समर्थन: JPG, PNG, WEBP (अधिकतम 10MB)">Supports: JPG, PNG, WEBP (Max 10MB)</p>
+                </div>
+
+                <div class="section-title" style="margin-top: 2rem;" data-en="Tips for Better Results" data-ne="राम्रो परिणामका लागि सुझाव">Tips for Better Results</div>
+                <div class="tips-section">
+                    <div class="tip-card">
+                        <div class="tip-title"> <span data-en="Clear Focus" data-ne="स्पष्ट फोकस">Clear Focus</span></div>
+                        <div class="tip-desc" data-en="Take close-up photos with good lighting" data-ne="राम्रो प्रकाशको साथ क्लोज-अप फोटो लिनुहोस्">Take close-up photos with good lighting</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title"> <span data-en="Show Symptoms" data-ne="लक्षण देखाउनुहोस्">Show Symptoms</span></div>
+                        <div class="tip-desc" data-en="Include affected areas in the frame" data-ne="फ्रेममा प्रभावित क्षेत्रहरू समावेश गर्नुहोस्">Include affected areas in the frame</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title"><span data-en="Multiple Angles" data-ne="धेरै कोण">Multiple Angles</span></div>
+                        <div class="tip-desc" data-en="Scan from different perspectives" data-ne="विभिन्न दृष्टिकोणबाट स्क्यान गर्नुहोस्">Scan from different perspectives</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <h2 class="section-title" data-en="Scan History" data-ne="स्क्यान इतिहास">Scan History</h2>
+            <div class="history-grid" id="historyGrid">
+                <div class="history-card">
+                    <div class="history-header">
+                        <div class="history-date">Jan 15, 2026</div>
+                        <div class="history-status status-detected" data-en="Disease Detected" data-ne="रोग पत्ता लागेको">Disease Detected</div>
+                    </div>
+                    <div class="history-crop" data-en="Tomato Plant" data-ne="टमाटर बिरुवा">Tomato Plant</div>
+                    <div class="history-disease" data-en="Late Blight detected" data-ne="लेट ब्लाइट पत्ता लाग्यो">Late Blight detected</div>
+                </div>
+                
+                <div class="history-card">
+                    <div class="history-header">
+                        <div class="history-date">Jan 12, 2026</div>
+                        <div class="history-status status-healthy" data-en="Healthy" data-ne="स्वस्थ">Healthy</div>
+                    </div>
+                    <div class="history-crop" data-en="Rice Crop" data-ne="धान बाली">Rice Crop</div>
+                    <div class="history-disease" data-en="No disease detected" data-ne="कुनै रोग पत्ता लागेन">No disease detected</div>
+                </div>
+                
+                <div class="history-card">
+                    <div class="history-header">
+                        <div class="history-date">Jan 10, 2026</div>
+                        <div class="history-status status-detected" data-en="Disease Detected" data-ne="रोग पत्ता लागेको">Disease Detected</div>
+                    </div>
+                    <div class="history-crop" data-en="Wheat Field" data-ne="गहुँको खेत">Wheat Field</div>
+                    <div class="history-disease" data-en="Rust disease identified" data-ne="रस्ट रोग पहिचान भयो">Rust disease identified</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketplace Tab -->
+        <div id="marketplace" class="tab-content">
+            <h2 class="section-title" data-en="Agricultural Marketplace" data-ne="कृषि बजार">Agricultural Marketplace</h2>
+            
+            <div class="marketplace-filters">
+                <button class="filter-btn active" data-en="All Products" data-ne="सबै उत्पादन">All Products</button>
+                <button class="filter-btn" data-en="Seeds" data-ne="बीउ">Seeds</button>
+                <button class="filter-btn" data-en="Fertilizers" data-ne="मल">Fertilizers</button>
+                <button class="filter-btn" data-en="Pesticides" data-ne="कीटनाशक">Pesticides</button>
+                <button class="filter-btn" data-en="Tools" data-ne="औजार">Tools</button>
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image">🌱</div>
+                    <div class="product-info">
+                        <div class="product-category" data-en="Seeds" data-ne="बीउ">Seeds</div>
+                        <div class="product-name" data-en="Hybrid Tomato Seeds" data-ne="हाइब्रिड टमाटर बीउ">Hybrid Tomato Seeds</div>
+                        <div class="product-price">NPR 450</div>
+                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-image">🧪</div>
+                    <div class="product-info">
+                        <div class="product-category" data-en="Fertilizers" data-ne="मल">Fertilizers</div>
+                        <div class="product-name" data-en="Organic Compost" data-ne="जैविक मल">Organic Compost</div>
+                        <div class="product-price">NPR 850</div>
+                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-image">🛡️</div>
+                    <div class="product-info">
+                        <div class="product-category" data-en="Pesticides" data-ne="कीटनाशक">Pesticides</div>
+                        <div class="product-name" data-en="Bio Pesticide Spray" data-ne="जैविक कीटनाशक स्प्रे">Bio Pesticide Spray</div>
+                        <div class="product-price">NPR 1,200</div>
+                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-image">⚒️</div>
+                    <div class="product-info">
+                        <div class="product-category" data-en="Tools" data-ne="औजार">Tools</div>
+                        <div class="product-name" data-en="Garden Tool Set" data-ne="बगैचा औजार सेट">Garden Tool Set</div>
+                        <div class="product-price">NPR 2,500</div>
+                        <button class="product-btn" data-en="Add to Cart" data-ne="कार्टमा थप्नुहोस्">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Tab -->
+        <div id="community" class="tab-content">
+            <h2 class="section-title" data-en="Community & Support" data-ne="समुदाय र समर्थन">Community & Support</h2>
+            
+            <div class="community-section">
+                <div class="forum-section">
+                    <h3 style="margin-bottom: 1.5rem;" data-en="Recent Discussions" data-ne="हालका छलफल">Recent Discussions</h3>
+                    
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">Ramesh Kumar</span>
+                            <span class="post-time">2 hours ago</span>
+                        </div>
+                        <div class="post-title" data-en="Best practices for tomato cultivation?" data-ne="टमाटर खेतीका लागि उत्तम अभ्यास?">Best practices for tomato cultivation?</div>
+                        <div class="post-content" data-en="Looking for advice on growing tomatoes in the current season..." data-ne="हालको मौसममा टमाटर उब्जाउने बारे सल्लाह खोज्दै...">Looking for advice on growing tomatoes in the current season...</div>
+                        <div class="post-actions">
+                            <button class="action-btn">👍 12</button>
+                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
+                        </div>
+                    </div>
+
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">Sita Devi</span>
+                            <span class="post-time">5 hours ago</span>
+                        </div>
+                        <div class="post-title" data-en="Dealing with pest infestation" data-ne="कीट संक्रमणसँग व्यवहार">Dealing with pest infestation</div>
+                        <div class="post-content" data-en="Found small insects on my cabbage plants. Any organic solutions?" data-ne="मेरो बन्दाकोपीको बोटमा साना कीराहरू भेटिए। कुनै जैविक समाधान?">Found small insects on my cabbage plants. Any organic solutions?</div>
+                        <div class="post-actions">
+                            <button class="action-btn">👍 8</button>
+                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
+                        </div>
+                    </div>
+
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">Krishna Bahadur</span>
+                            <span class="post-time">1 day ago</span>
+                        </div>
+                        <div class="post-title" data-en="Monsoon farming tips needed" data-ne="मनसुन खेती सुझाव चाहिन्छ">Monsoon farming tips needed</div>
+                        <div class="post-content" data-en="What crops grow best during the monsoon season in Nepal?" data-ne="नेपालमा मनसुन मौसममा कुन बालीहरू राम्रो उम्रन्छन्?">What crops grow best during the monsoon season in Nepal?</div>
+                        <div class="post-actions">
+                            <button class="action-btn">👍 15</button>
+                            <button class="action-btn" data-en="Reply" data-ne="जवाफ">💬 Reply</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resources-panel">
+                    <h3 style="margin-bottom: 1rem;" data-en="Quick Resources" data-ne="द्रुत स्रोतहरू">Quick Resources</h3>
+                    
+                    <div class="resource-item">
+                        <div class="resource-title" data-en="📚 Farming Guides" data-ne="📚 खेती गाइडहरू">📚 Farming Guides</div>
+                        <div class="resource-desc" data-en="Comprehensive cultivation guides" data-ne="व्यापक खेती गाइडहरू">Comprehensive cultivation guides</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-title" data-en="🎓 Video Tutorials" data-ne="🎓 भिडियो ट्यूटोरियल">🎓 Video Tutorials</div>
+                        <div class="resource-desc" data-en="Learn from expert farmers" data-ne="विशेषज्ञ किसानहरूबाट सिक्नुहोस्">Learn from expert farmers</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-title" data-en="☁️ Weather Updates" data-ne="☁️ मौसम अद्यावधिक">☁️ Weather Updates</div>
+                        <div class="resource-desc" data-en="Local weather forecasts" data-ne="स्थानीय मौसम पूर्वानुमान">Local weather forecasts</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-title" data-en="📞 Expert Helpline" data-ne="📞 विशेषज्ञ हेल्पलाइन">📞 Expert Helpline</div>
+                        <div class="resource-desc" data-en="Get agricultural advice" data-ne="कृषि सल्लाह प्राप्त गर्नुहोस्">Get agricultural advice</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-title" data-en="💰 Subsidy Information" data-ne="💰 अनुदान जानकारी">💰 Subsidy Information</div>
+                        <div class="resource-desc" data-en="Government schemes & support" data-ne="सरकारी योजना र समर्थन">Government schemes & support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
