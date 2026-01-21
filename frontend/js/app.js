@@ -1,101 +1,225 @@
+// =============================================
+// MAIN APPLICATION
+// =============================================
+
 class PlantDiseaseApp {
     constructor() {
         this.supabase = window.supabaseClient;
-        this.auth = window.authManager;
+        this.geminiAI = window.geminiAI;
         this.currentImage = null;
         this.currentImageBase64 = null;
-        this.isProcessing = false;
+        this.init();
+    }
+
+    async init() {
+        await this.waitForDependencies();
+        this.setupEventListeners();
+        this.checkAuthState();
+    }
+
+    async waitForDependencies() {
+        return new Promise(resolve => {
+            const check = () => {
+                if (window.authManager && window.geminiAI) {
+                    resolve();
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        });
+    }
+
+    checkAuthState() {
+        setTimeout(() => {
+            const user = window.authManager?.getUser();
+            this.updateUIForAuth(!!user);
+        }, 500);
+    }
+
+    updateUIForAuth(isLoggedIn) {
+        document.querySelectorAll('.auth-required').forEach(el => {
+            el.style.display = isLoggedIn ? '' : 'none';
+        });
+        document.querySelectorAll('.guest-only').forEach(el => {
+            el.style.display = isLoggedIn ? 'none' : '';
+        });
         
-        this.initElements();
-        this.bindEvents();
-    }
-
-    initElements() {
-        // Camera/Upload elements
-        this.cameraBtn = document.getElementById('camera-btn');
-        this.uploadBtn = document.getElementById('upload-btn');
-        this.fileInput = document.getElementById('file-input');
-        this.cameraInput = document.getElementById('camera-input');
-        this.previewImage = document.getElementById('preview-image');
-        this.previewContainer = document.getElementById('preview-container');
-        this.analyzeBtn = document.getElementById('analyze-btn');
-        this.resultsContainer = document.getElementById('results-container');
-        this.loadingOverlay = document.getElementById('loading-overlay');
-    }
-
-    bindEvents() {
-        // Upload button
-        if (this.uploadBtn) {
-            this.uploadBtn.addEventListener('click', () => {
-                this.fileInput?.click();
+        if (isLoggedIn && window.authManager?.getUser()) {
+            document.querySelectorAll('.user-email').forEach(el => {
+                el.textContent = window.authManager.getUser().email;
             });
         }
+    }
 
+    setupEventListeners() {
         // Camera button
-        if (this.cameraBtn) {
-            this.cameraBtn.addEventListener('click', () => {
-                this.cameraInput?.click();
-            });
-        }
+        document.getElementById('camera-btn')?.addEventListener('click', () => {
+            this.openCamera();
+        });
 
-        // File input change
-        if (this.fileInput) {
-            this.fileInput.addEventListener('change', (e) => {
-                this.handleImageSelect(e.target.files[0]);
-            });
-        }
+        // Upload button
+        document.getElementById('upload-btn')?.addEventListener('click', () => {
+            document.getElementById('file-input')?.click();
+        });
 
-        // Camera input change
-        if (this.cameraInput) {
-            this.cameraInput.addEventListener('change', (e) => {
-                this.handleImageSelect(e.target.files[0]);
-            });
-        }
+        // File input
+        document.getElementById('file-input')?.addEventListener('change', (e) => {
+            this.handleFileSelect(e);
+        });
 
         // Analyze button
-        if (this.analyzeBtn) {
-            this.analyzeBtn.addEventListener('click', () => {
-                this.analyzeImage();
-            });
-        }
+        document.getElementById('analyze-btn')?.addEventListener('click', () => {
+            this.analyzePlant();
+        });
+
+        // Retake button
+        document.getElementById('retake-btn')?.addEventListener('click', () => {
+            this.resetCapture();
+        });
 
         // Drag and drop
-        const dropZone = document.getElementById('drop-zone');
-        if (dropZone) {
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
+        this.setupDragDrop();
+    }
 
-            dropZone.addEventListener('dragleave', () => {
-                dropZone.classList.remove('dragover');
-            });
+    setupDragDrop() {
+        const dropZone = document.querySelector('.scan-section');
+        if (!dropZone) return;
 
-            dropZone.addEventListener('drop', (e) => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+            dropZone.addEventListener(event, (e) => {
                 e.preventDefault();
-                dropZone.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    this.handleImageSelect(file);
+                e.stopPropagation();
+            });
+        });
+
+        dropZone.addEventListener('dragover', () => {
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                this.processFile(file);
+            }
+        });
+    }
+
+    // =========================================
+    // CAMERA FUNCTIONS
+    // =========================================
+    async openCamera() {
+        if (!this.checkAuth()) return;
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
                 }
             });
+
+            const videoContainer = document.getElementById('video-container');
+            const video = document.getElementById('camera-video');
+
+            video.srcObject = stream;
+            await video.play();
+            videoContainer.classList.remove('hidden');
+
+            // Hide scan options
+            document.querySelector('.scan-options')?.classList.add('hidden');
+
+            // Setup capture button
+            document.getElementById('capture-btn').onclick = () => {
+                this.captureFromCamera(video, stream);
+            };
+
+            // Setup close button
+            this.addCameraControls(stream, videoContainer);
+
+        } catch (error) {
+            console.error('Camera error:', error);
+            if (error.name === 'NotAllowedError') {
+                this.showNotification('Camera access denied. Please enable camera permissions.', 'error');
+            } else {
+                this.showNotification('Could not access camera. Try uploading an image.', 'error');
+            }
         }
     }
 
-    // ==========================================
-    // IMAGE HANDLING
-    // ==========================================
-    async handleImageSelect(file) {
-        if (!file) return;
+    addCameraControls(stream, container) {
+        // Remove existing controls
+        container.querySelector('.camera-controls')?.remove();
 
-        // Validate file
-        if (!APP_CONFIG.supportedFormats.includes(file.type)) {
-            this.showNotification('Please select a valid image (JPEG, PNG, WebP)', 'error');
+        const controls = document.createElement('div');
+        controls.className = 'camera-controls';
+        controls.innerHTML = `
+            <button class="btn-close-camera" title="Close camera">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        container.appendChild(controls);
+
+        controls.querySelector('.btn-close-camera').onclick = () => {
+            stream.getTracks().forEach(track => track.stop());
+            container.classList.add('hidden');
+            document.querySelector('.scan-options')?.classList.remove('hidden');
+        };
+    }
+
+    captureFromCamera(video, stream) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+
+        // Stop camera
+        stream.getTracks().forEach(track => track.stop());
+        document.getElementById('video-container').classList.add('hidden');
+
+        // Get base64
+        this.currentImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+        // Create file for upload
+        canvas.toBlob((blob) => {
+            this.currentImage = new File([blob], `plant_${Date.now()}.jpg`, {
+                type: 'image/jpeg'
+            });
+            this.showPreview(this.currentImageBase64);
+        }, 'image/jpeg', 0.9);
+    }
+
+    // =========================================
+    // FILE HANDLING
+    // =========================================
+    handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            this.processFile(file);
+        }
+    }
+
+    processFile(file) {
+        if (!this.checkAuth()) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            this.showNotification('Please select an image file', 'error');
             return;
         }
 
-        if (file.size > APP_CONFIG.maxImageSize) {
-            this.showNotification('Image too large. Maximum size is 5MB', 'error');
+        // Validate file size
+        if (file.size > CONFIG.MAX_IMAGE_SIZE) {
+            this.showNotification('Image too large. Maximum size is 10MB.', 'error');
             return;
         }
 
@@ -104,86 +228,88 @@ class PlantDiseaseApp {
         // Convert to base64
         const reader = new FileReader();
         reader.onload = (e) => {
-            this.currentImageBase64 = e.target.result.split(',')[1];
-            
-            // Show preview
-            if (this.previewImage) {
-                this.previewImage.src = e.target.result;
-            }
-            if (this.previewContainer) {
-                this.previewContainer.style.display = 'block';
-            }
-            if (this.analyzeBtn) {
-                this.analyzeBtn.disabled = false;
-            }
+            this.currentImageBase64 = e.target.result;
+            this.showPreview(this.currentImageBase64);
+        };
+        reader.onerror = () => {
+            this.showNotification('Error reading file', 'error');
         };
         reader.readAsDataURL(file);
     }
 
-    // ==========================================
-    // PLANT.ID API INTEGRATION
-    // ==========================================
-    async analyzeImage() {
-        if (!this.auth.isAuthenticated()) {
-            this.showNotification('Please sign in to analyze plants', 'error');
-            window.location.href = 'auth.html';
+    showPreview(imageSrc) {
+        const preview = document.getElementById('preview-container');
+        const previewImg = document.getElementById('preview-image');
+        const actions = document.getElementById('action-buttons');
+        const scanOptions = document.querySelector('.scan-options');
+
+        previewImg.src = imageSrc;
+        preview.classList.remove('hidden');
+        actions.classList.remove('hidden');
+        scanOptions?.classList.add('hidden');
+    }
+
+    resetCapture() {
+        this.currentImage = null;
+        this.currentImageBase64 = null;
+
+        document.getElementById('preview-container')?.classList.add('hidden');
+        document.getElementById('action-buttons')?.classList.add('hidden');
+        document.getElementById('video-container')?.classList.add('hidden');
+        document.getElementById('file-input').value = '';
+        document.querySelector('.scan-options')?.classList.remove('hidden');
+    }
+
+    // =========================================
+    // MAIN ANALYSIS FUNCTION
+    // =========================================
+    async analyzePlant() {
+        if (!this.currentImageBase64) {
+            this.showNotification('Please capture or upload an image first', 'error');
             return;
         }
 
-        if (!this.currentImageBase64 || this.isProcessing) return;
+        if (!this.checkAuth()) return;
 
-        this.isProcessing = true;
-        this.showLoading(true);
+        // Show loading
+        this.showLoading(true, 'Analyzing your plant with AI...');
 
         try {
-            // Call Plant.id API
-            const response = await fetch(APP_CONFIG.plantIdApi, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Api-Key': PLANT_ID_API_KEY
-                },
-                body: JSON.stringify({
-                    images: [this.currentImageBase64],
-                    latitude: null,
-                    longitude: null,
-                    similar_images: true,
-                    health: 'all',
-                    disease_details: ['description', 'treatment', 'cause']
-                })
-            });
+            // Step 1: Upload image to Supabase
+            this.updateLoadingMessage('Uploading image...');
+            const imageData = await this.uploadImage();
 
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
+            // Step 2: Analyze with Gemini AI
+            this.updateLoadingMessage('🌿 AI is analyzing your plant...');
+            const analysisResult = await this.geminiAI.analyzePlant(this.currentImageBase64);
+
+            if (!analysisResult.success) {
+                throw new Error(analysisResult.error || 'Analysis failed');
             }
 
-            const result = await response.json();
-            console.log('Plant.id Response:', result);
+            // Step 3: Save to database
+            this.updateLoadingMessage('Saving results...');
+            const savedScan = await this.saveScanResults(imageData, analysisResult.data);
 
-            // Upload image to Supabase Storage
-            const imageUrl = await this.uploadImage();
-
-            // Save scan to database
-            const scanData = await this.saveScan(result, imageUrl);
-
-            // Display results
-            this.displayResults(result, scanData);
+            // Step 4: Redirect to results
+            this.showNotification('Analysis complete!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = `results.html?id=${savedScan.id}`;
+            }, 500);
 
         } catch (error) {
             console.error('Analysis error:', error);
-            this.showNotification('Failed to analyze image. Please try again.', 'error');
+            this.showNotification(error.message || 'Analysis failed. Please try again.', 'error');
         } finally {
-            this.isProcessing = false;
             this.showLoading(false);
         }
     }
 
-    // ==========================================
-    // STORAGE UPLOAD
-    // ==========================================
     async uploadImage() {
-        const userId = this.auth.currentUser.id;
-        const fileName = `${userId}/${Date.now()}_${this.currentImage.name}`;
+        const user = window.authManager.getUser();
+        const timestamp = Date.now();
+        const fileName = `${user.id}/${timestamp}_${this.currentImage.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
 
         const { data, error } = await this.supabase.storage
             .from('plant-images')
@@ -193,226 +319,150 @@ class PlantDiseaseApp {
             });
 
         if (error) {
-            console.error('Upload error:', error);
-            throw error;
+            throw new Error('Failed to upload image');
         }
 
         // Get public URL
-        const { data: { publicUrl } } = this.supabase.storage
+        const { data: urlData } = this.supabase.storage
             .from('plant-images')
             .getPublicUrl(fileName);
 
-        return publicUrl;
+        return {
+            path: fileName,
+            url: urlData.publicUrl
+        };
     }
 
-    // ==========================================
-    // SAVE SCAN TO DATABASE
-    // ==========================================
-    async saveScan(apiResult, imageUrl) {
-        const result = apiResult.result;
-        
-        // Extract plant info
-        const plantSuggestion = result.classification?.suggestions?.[0];
-        const healthAssessment = result.is_healthy;
-        const diseases = result.disease?.suggestions || [];
+    async saveScanResults(imageData, analysisData) {
+        const user = window.authManager.getUser();
 
-        const scanData = {
-            user_id: this.auth.currentUser.id,
-            image_url: imageUrl,
-            image_path: imageUrl,
-            
-            // Plant identification
-            plant_name: plantSuggestion?.name || 'Unknown',
-            plant_common_names: plantSuggestion?.details?.common_names || [],
-            plant_scientific_name: plantSuggestion?.name || null,
-            plant_probability: plantSuggestion?.probability || 0,
-            
-            // Health assessment
-            is_healthy: healthAssessment?.binary ?? true,
-            health_probability: healthAssessment?.probability ?? 1,
-            
-            // Diseases
-            diseases: diseases.map(d => ({
-                name: d.name,
-                probability: d.probability,
-                description: d.details?.description,
-                treatment: d.details?.treatment,
-                cause: d.details?.cause
-            })),
-            
-            // Raw response
-            raw_response: apiResult
-        };
-
-        const { data, error } = await this.supabase
-            .from('scans')
-            .insert(scanData)
+        // Insert main scan record
+        const { data: scanData, error: scanError } = await this.supabase
+            .from('plant_scans')
+            .insert({
+                user_id: user.id,
+                image_url: imageData.url,
+                image_path: imageData.path,
+                status: 'completed',
+                is_healthy: analysisData.healthAssessment.isHealthy,
+                health_score: analysisData.healthAssessment.healthScore,
+                plant_name: analysisData.plantIdentification.commonName,
+                plant_scientific_name: analysisData.plantIdentification.scientificName,
+                api_response: analysisData
+            })
             .select()
             .single();
 
-        if (error) {
-            console.error('Save error:', error);
-            throw error;
+        if (scanError) {
+            throw new Error('Failed to save scan');
         }
 
-        return data;
+        // Insert detected diseases
+        if (analysisData.diseases && analysisData.diseases.length > 0) {
+            const diseaseRecords = analysisData.diseases.map(disease => ({
+                scan_id: scanData.id,
+                disease_name: disease.name,
+                scientific_name: disease.scientificName,
+                probability: disease.confidence,
+                description: disease.description,
+                treatment: [
+                    ...analysisData.treatments.immediate,
+                    ...analysisData.treatments.chemical.map(t => t.product),
+                    ...analysisData.treatments.organic.map(t => t.method)
+                ],
+                prevention: analysisData.prevention,
+                severity: disease.severity
+            }));
+
+            await this.supabase
+                .from('detected_diseases')
+                .insert(diseaseRecords);
+        }
+
+        return scanData;
     }
 
-    // ==========================================
-    // DISPLAY RESULTS
-    // ==========================================
-    displayResults(apiResult, scanData) {
-        if (!this.resultsContainer) return;
+    // =========================================
+    // UTILITY FUNCTIONS
+    // =========================================
+    checkAuth() {
+        if (!window.authManager?.isAuthenticated()) {
+            this.showNotification('Please sign in to analyze plants', 'warning');
+            setTimeout(() => {
+                window.location.href = 'auth.html';
+            }, 1500);
+            return false;
+        }
+        return true;
+    }
 
-        const result = apiResult.result;
-        const isHealthy = result.is_healthy?.binary ?? true;
-        const diseases = result.disease?.suggestions || [];
+    showLoading(show, message = 'Loading...') {
+        let overlay = document.getElementById('loading-overlay');
 
-        let html = `
-            <div class="results-card ${isHealthy ? 'healthy' : 'diseased'}">
-                <div class="results-header">
-                    <div class="health-status">
-                        <span class="status-icon">${isHealthy ? '✅' : '⚠️'}</span>
-                        <span class="status-text">${isHealthy ? 'Healthy Plant' : 'Issues Detected'}</span>
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="loader">
+                    <div class="loader-icon">
+                        <i class="fas fa-seedling fa-pulse"></i>
                     </div>
-                    <span class="confidence">
-                        ${Math.round((result.is_healthy?.probability || 1) * 100)}% confidence
-                    </span>
-                </div>
-
-                <div class="plant-info">
-                    <h3>🌱 Plant Identification</h3>
-                    <p class="plant-name">${scanData.plant_name}</p>
-                    ${scanData.plant_common_names?.length ? 
-                        `<p class="common-names">Also known as: ${scanData.plant_common_names.join(', ')}</p>` : ''}
-                    <p class="probability">Confidence: ${Math.round(scanData.plant_probability * 100)}%</p>
-                </div>
-
-                ${!isHealthy && diseases.length > 0 ? `
-                    <div class="diseases-section">
-                        <h3>🦠 Detected Issues</h3>
-                        <div class="diseases-list">
-                            ${diseases.slice(0, 3).map(disease => `
-                                <div class="disease-item">
-                                    <div class="disease-header">
-                                        <span class="disease-name">${disease.name}</span>
-                                        <span class="disease-probability">${Math.round(disease.probability * 100)}%</span>
-                                    </div>
-                                    ${disease.details?.description ? 
-                                        `<p class="disease-description">${disease.details.description}</p>` : ''}
-                                    ${disease.details?.treatment ? `
-                                        <div class="treatment">
-                                            <strong>💊 Treatment:</strong>
-                                            <p>${this.formatTreatment(disease.details.treatment)}</p>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
+                    <p class="loader-message">${message}</p>
+                    <div class="loader-bar">
+                        <div class="loader-progress"></div>
                     </div>
-                ` : ''}
-
-                <div class="results-actions">
-                    <button class="btn btn-secondary" onclick="app.resetScan()">
-                        📷 New Scan
-                    </button>
-                    <button class="btn btn-primary" onclick="app.saveFavorite('${scanData.id}')">
-                        ⭐ Save to Favorites
-                    </button>
-                    <button class="btn btn-outline" onclick="app.shareResults('${scanData.id}')">
-                        📤 Share
-                    </button>
                 </div>
-            </div>
-        `;
-
-        this.resultsContainer.innerHTML = html;
-        this.resultsContainer.style.display = 'block';
-        this.resultsContainer.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    formatTreatment(treatment) {
-        if (typeof treatment === 'object') {
-            return Object.entries(treatment)
-                .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
-                .join('<br>');
+            `;
+            document.body.appendChild(overlay);
         }
-        return treatment;
-    }
 
-
-    async saveFavorite(scanId) {
-        const { error } = await this.supabase
-            .from('scans')
-            .update({ is_favorite: true })
-            .eq('id', scanId);
-
-        if (error) {
-            this.showNotification('Failed to save favorite', 'error');
+        if (show) {
+            overlay.classList.remove('hidden');
+            overlay.querySelector('.loader-message').textContent = message;
         } else {
-            this.showNotification('Saved to favorites!', 'success');
+            overlay.classList.add('hidden');
         }
     }
 
-    async shareResults(scanId) {
-        const shareUrl = `${window.location.origin}/results.html?id=${scanId}`;
-        
-        if (navigator.share) {
-            await navigator.share({
-                title: 'Plant Health Analysis',
-                url: shareUrl
-            });
-        } else {
-            await navigator.clipboard.writeText(shareUrl);
-            this.showNotification('Link copied to clipboard!', 'success');
-        }
-    }
-
-    resetScan() {
-        this.currentImage = null;
-        this.currentImageBase64 = null;
-        
-        if (this.previewContainer) {
-            this.previewContainer.style.display = 'none';
-        }
-        if (this.resultsContainer) {
-            this.resultsContainer.style.display = 'none';
-        }
-        if (this.analyzeBtn) {
-            this.analyzeBtn.disabled = true;
-        }
-        if (this.fileInput) {
-            this.fileInput.value = '';
-        }
-        if (this.cameraInput) {
-            this.cameraInput.value = '';
-        }
-    }
-
-    showLoading(show) {
-        if (this.loadingOverlay) {
-            this.loadingOverlay.style.display = show ? 'flex' : 'none';
+    updateLoadingMessage(message) {
+        const msgEl = document.querySelector('.loader-message');
+        if (msgEl) {
+            msgEl.textContent = message;
         }
     }
 
     showNotification(message, type = 'info') {
+        // Remove existing notifications
+        document.querySelectorAll('.notification').forEach(n => n.remove());
+
+        const icons = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+
         const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${icons[type]}"></i>
+            <span>${message}</span>
+        `;
+
         document.body.appendChild(notification);
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             notification.classList.add('show');
-        }, 100);
+        });
 
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        }, 4000);
     }
 }
 
-// Initialize app when DOM is ready
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new PlantDiseaseApp();
+    window.plantApp = new PlantDiseaseApp();
 });

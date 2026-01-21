@@ -1,11 +1,38 @@
+// ============================================
+// DIGITAL KRISHI - LOGIN AUTHENTICATION
+// ============================================
+
 // Get form elements
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const rememberMeCheckbox = document.getElementById('rememberMe');
 
-// Load saved email if "Remember me" was checked
-window.addEventListener('DOMContentLoaded', () => {
+// Initialize Supabase auth
+let supabase;
+let currentUser = null;
+
+// Wait for DOM and config to load
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for supabase config to load
+    if (typeof window.supabaseClient === 'undefined') {
+        console.error('Supabase config not loaded. Make sure supabase-config.js is loaded first.');
+        return;
+    }
+    
+    supabase = window.supabaseClient;
+    
+    // Check for existing session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        currentUser = session.user;
+        console.log('User already logged in:', currentUser.email);
+        // Redirect to dashboard if already logged in
+        window.location.href = './dashboard.html';
+        return;
+    }
+    
+    // Load saved email if "Remember me" was checked
     const savedEmail = localStorage.getItem('rememberedEmail');
     const wasRemembered = localStorage.getItem('rememberMe') === 'true';
     
@@ -13,10 +40,28 @@ window.addEventListener('DOMContentLoaded', () => {
         emailInput.value = savedEmail;
         rememberMeCheckbox.checked = true;
     }
+    
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state change:', event);
+        
+        if (event === 'SIGNED_IN' && session) {
+            currentUser = session.user;
+            console.log('User signed in:', currentUser.email);
+            showSuccess('Login successful! Redirecting to dashboard...');
+            
+            setTimeout(() => {
+                window.location.href = './dashboard.html';
+            }, 1500);
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            console.log('User signed out');
+        }
+    });
 });
 
 // Form submission handler
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const email = emailInput.value.trim();
@@ -29,8 +74,8 @@ loginForm.addEventListener('submit', (e) => {
         return;
     }
     
-    if (password.length < 6) {
-        showError('Password must be at least 6 characters long');
+    if (password.length < APP_CONFIG?.auth?.passwordMinLength || 6) {
+        showError(`Password must be at least ${APP_CONFIG?.auth?.passwordMinLength || 6} characters long`);
         return;
     }
     
@@ -43,8 +88,8 @@ loginForm.addEventListener('submit', (e) => {
         localStorage.removeItem('rememberMe');
     }
     
-    // Simulate login (replace with actual API call)
-    handleLogin(email, password);
+    // Handle login with Supabase
+    await handleLogin(email, password);
 });
 
 // Email validation
@@ -55,25 +100,16 @@ function validateEmail(email) {
 
 // Show error message
 function showError(message) {
-    // Create error element if it doesn't exist
-    let errorElement = document.querySelector('.error-message');
+    // Remove existing messages
+    removeMessages();
     
-    if (!errorElement) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        errorElement.style.cssText = `
-            background-color: #fee2e2;
-            color: #991b1b;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            border: 1px solid #fecaca;
-        `;
-        loginForm.insertBefore(errorElement, loginForm.firstChild);
-    }
-    
+    // Create error element
+    const errorElement = document.createElement('div');
+    errorElement.className = 'auth-message error';
     errorElement.textContent = message;
+    
+    // Insert before form
+    loginForm.insertBefore(errorElement, loginForm.firstChild);
     
     // Remove error after 5 seconds
     setTimeout(() => {
@@ -83,20 +119,15 @@ function showError(message) {
 
 // Show success message
 function showSuccess(message) {
+    // Remove existing messages
+    removeMessages();
+    
     // Create success element
     const successElement = document.createElement('div');
-    successElement.className = 'success-message';
-    successElement.style.cssText = `
-        background-color: #d1fae5;
-        color: #065f46;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        margin-bottom: 1rem;
-        font-size: 0.875rem;
-        border: 1px solid #6ee7b7;
-    `;
+    successElement.className = 'auth-message success';
     successElement.textContent = message;
     
+    // Insert before form
     loginForm.insertBefore(successElement, loginForm.firstChild);
     
     // Remove success message after 3 seconds
@@ -105,38 +136,137 @@ function showSuccess(message) {
     }, 3000);
 }
 
-// Handle login (simulate API call)
-function handleLogin(email, password) {
+// Remove all auth messages
+function removeMessages() {
+    const messages = document.querySelectorAll('.auth-message');
+    messages.forEach(msg => msg.remove());
+}
+
+// Handle login with Supabase
+async function handleLogin(email, password) {
     // Show loading state
     const submitButton = document.querySelector('.btn-signin');
     const originalText = submitButton.textContent;
     submitButton.textContent = 'Signing In...';
     submitButton.disabled = true;
     
-    // Simulate API call with setTimeout
-    setTimeout(() => {
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        console.log('Login successful:', data);
+        // Auth state change listener will handle redirect
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        
+        // Handle specific error messages
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (error.message.includes('Invalid login credentials')) {
+            errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = 'Please confirm your email address before signing in. Check your inbox for the confirmation link.';
+        } else if (error.message.includes('Too many requests')) {
+            errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        showError(errorMessage);
+        
         // Reset button state
         submitButton.textContent = originalText;
         submitButton.disabled = false;
-        
-        // Show success message
-        showSuccess('Login successful! Redirecting to dashboard...');
-        
-        // Log the attempt (in production, this would be an API call)
-        console.log('Login attempt:', {
-            email: email,
-            timestamp: new Date().toISOString(),
-            rememberMe: rememberMeCheckbox.checked
-        });
-        
-        // Simulate redirect to dashboard
-        setTimeout(() => {
-            // window.location.href = '/dashboard';
-            console.log('Redirecting to dashboard...');
-        }, 1500);
-    }, 1500);
+    }
 }
 
+// Social authentication
+async function socialAuth(provider) {
+    if (!supabase) {
+        showError('Authentication system not ready. Please refresh the page.');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: provider,
+            options: {
+                redirectTo: APP_CONFIG?.auth?.redirectUrl || `${window.location.origin}/dashboard.html`
+            }
+        });
+
+        if (error) {
+            throw error;
+        }
+        
+        console.log(`OAuth with ${provider} initiated`);
+        
+    } catch (error) {
+        console.error(`${provider} OAuth error:`, error);
+        showError(`Failed to sign in with ${provider}. Please try again.`);
+    }
+}
+
+// Password reset handler
+async function handlePasswordReset(email) {
+    if (!supabase) {
+        showError('Authentication system not ready. Please refresh the page.');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password.html`
+        });
+
+        if (error) {
+            throw error;
+        }
+        
+        showSuccess('Password reset email sent! Please check your inbox.');
+        
+    } catch (error) {
+        console.error('Password reset error:', error);
+        showError('Failed to send password reset email. Please try again.');
+    }
+}
+
+// Forgot Password handler
+document.querySelector('.forgot-password').addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        showError('Please enter your email address first');
+        emailInput.focus();
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showError('Please enter a valid email address');
+        emailInput.focus();
+        return;
+    }
+    
+    await handlePasswordReset(email);
+});
+
+// Sign Up link handler
+document.querySelector('.signup-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Redirecting to sign up page...');
+    window.location.href = './signup.html';
+});
+
+// Input animations
 const inputs = document.querySelectorAll('.form-input');
 inputs.forEach(input => {
     input.addEventListener('focus', function() {
@@ -149,14 +279,5 @@ inputs.forEach(input => {
     });
 });
 
-// Forgot Password handler
-document.querySelector('.forgot-password').addEventListener('click', (e) => {
-    e.preventDefault();
-});
-
-// Sign Up link handler
-document.querySelector('.signup-link').addEventListener('click', (e) => {
-    e.preventDefault();
-    console.log('Redirecting to sign up page...');
-    window.location.href = './signup.html';
-});
+// Make socialAuth function globally available
+window.socialAuth = socialAuth;
