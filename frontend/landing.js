@@ -146,10 +146,17 @@ statValues.forEach(stat => {
     statsObserver.observe(stat);
 });
 
-// Button click effects
+// Button click effects and redirects
 const buttons = document.querySelectorAll('.btn, .btn-nav');
 buttons.forEach(button => {
     button.addEventListener('click', function (e) {
+        // Check if button should redirect to login
+        const buttonText = this.textContent.trim();
+        if (buttonText.includes('Get Started') || buttonText.includes('Start Identifying')) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         // Create ripple effect
         const ripple = document.createElement('span');
         const rect = this.getBoundingClientRect();
