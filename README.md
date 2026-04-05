@@ -373,3 +373,4 @@ The AI service uses Google's Gemini API under their terms of service.
 **Status**: Production Ready ✅
 
 🌾 **Happy Farming!** 🌾
+# digitalized-krishi
